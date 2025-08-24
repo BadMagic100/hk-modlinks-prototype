@@ -10,7 +10,10 @@ export default tseslint.config(
   {
     languageOptions: {
       parserOptions: {
-        projectService: true,
+        projectService: {
+          defaultProject: "tsconfig.json",
+          allowDefaultProject: ["eslint.config.mts", "prettier.config.mjs"],
+        },
         tsconfigRootDir: import.meta.dirname,
       },
     },

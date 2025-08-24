@@ -2,10 +2,11 @@
   "name": "@badmagic/hk-modlinks",
   "version": "1.0.0",
   "description": "Prototype of using node to manage modlinks for Hollow Knight modding",
-  "main": "./dist/lib/index.js",
+  "exports": "./dist/index.js",
   "scripts": {
     "clean": "rm -rf dist",
     "lint": "eslint . --fix --cache",
+    "format:docs": "prettier --write docs/**.md",
     "test": "echo OK",
     "prepare": "husky && tsc"
   },
