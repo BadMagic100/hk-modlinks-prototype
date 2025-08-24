@@ -1,0 +1,33 @@
+{
+  "name": "@badmagic/hk-modlinks",
+  "version": "1.0.0",
+  "description": "Prototype of using node to manage modlinks for Hollow Knight modding",
+  "main": "index.ts",
+  "scripts": {
+    "lint": "eslint . --fix --cache",
+    "test": "echo OK",
+    "prepare": "husky"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/BadMagic100/hk-modlinks-prototype.git"
+  },
+  "author": "badmagic",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/BadMagic100/hk-modlinks-prototype/issues"
+  },
+  "homepage": "https://github.com/BadMagic100/hk-modlinks-prototype#readme",
+  "devDependencies": {
+    "@eslint/js": "^9.34.0",
+    "@types/node": "^24.3.0",
+    "eslint": "^9.34.0",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-prettier": "^5.5.4",
+    "husky": "^9.1.7",
+    "jiti": "^2.5.1",
+    "prettier": "^3.6.2",
+    "typescript": "^5.9.2",
+    "typescript-eslint": "^8.40.0"
+  }
+}
