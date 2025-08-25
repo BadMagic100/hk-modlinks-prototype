@@ -2,12 +2,14 @@
   // Visit https://aka.ms/tsconfig to read more about this file
   "compilerOptions": {
     // File Layout
-    "rootDir": "./src",
+    "rootDirs": ["./src", "./test"],
     "outDir": "./dist",
 
     // Environment Settings
     // See also https://aka.ms/tsconfig/module
     "module": "nodenext",
+    "moduleResolution": "nodenext",
+    "target": "esnext",
     "lib": ["esnext"],
     "types": ["node"],
 
@@ -29,5 +31,5 @@
     "moduleDetection": "force",
     "skipLibCheck": true,
   },
-  "exclude": ["eslint.config.mts", "node_modules/", "dist/"]
+  "exclude": ["eslint.config.mts", "node_modules/", "dist/", "bin/"]
 }
