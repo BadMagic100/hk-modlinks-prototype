@@ -3,6 +3,9 @@
   "version": "1.0.0",
   "description": "Prototype of using node to manage modlinks for Hollow Knight modding",
   "exports": "./dist/index.js",
+  "engines": {
+    "node": ">=22"
+  },
   "scripts": {
     "clean": "rm -rf dist",
     "lint": "eslint . --fix --cache",
