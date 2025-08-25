@@ -12,10 +12,21 @@ export default tseslint.config(
       parserOptions: {
         projectService: {
           defaultProject: "tsconfig.json",
-          allowDefaultProject: ["eslint.config.mts", "prettier.config.mjs"],
+          allowDefaultProject: [
+            "eslint.config.mts",
+            "prettier.config.mjs",
+            "bin/*.js",
+          ],
         },
         tsconfigRootDir: import.meta.dirname,
       },
+    },
+  },
+  {
+    files: ["test/**"],
+    rules: {
+      "@typescript-eslint/no-unused-vars": "off",
+      "@typescript-eslint/no-unsafe-assignment": "warn",
     },
   },
   // must be last
