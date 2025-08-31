@@ -1,11 +1,35 @@
+import type { Tags } from "./tags.js";
+
+type VersionCorePart = `${bigint}.${bigint}.${bigint}`;
+type PrereleasePart = `-${string}` | "";
+type BuildPart = `+${string}` | "";
+type Version = `${VersionCorePart}${PrereleasePart}${BuildPart}`;
+
+interface SingleLink {
+  url: string;
+  sha256: string;
+}
+
+interface PlatformLinks {
+  linux: SingleLink;
+  mac: SingleLink;
+  windows: SingleLink;
+}
+
 type NoCycle<OwnName, DependencyClosure> = OwnName extends DependencyClosure
   ? never
   : DependencyClosure;
 
 type BaseModConfig<Name extends string> = {
   readonly name: Name;
-  readonly description: string;
   readonly displayName?: string;
+  readonly description: string;
+  readonly version: Version;
+  readonly links: SingleLink | PlatformLinks;
+  readonly repository: string;
+  readonly issues?: string;
+  readonly tags?: Tags[];
+  readonly authors?: string[];
 };
 
 type UncheckedConfig<Name extends string> = BaseModConfig<Name> & {

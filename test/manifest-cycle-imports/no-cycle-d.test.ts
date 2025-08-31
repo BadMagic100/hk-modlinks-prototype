@@ -7,6 +7,12 @@ const d = new Manifest({
   name: "d",
   description: "",
   dependencies: [b, c],
+  version: "1.0.0",
+  repository: "https://github.com/BadMagic100/hk-modlinks",
+  links: {
+    url: "https://github.com/BadMagic100/hk-modlinks/releases/latest/download.zip",
+    sha256: "",
+  },
 });
 
 type _ = Expect<TypesEqual<typeof d, Manifest<"d", "a" | "b" | "c">>>;

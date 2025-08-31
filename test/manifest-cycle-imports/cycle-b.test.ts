@@ -5,7 +5,14 @@ import a from "./cycle-a.test.js";
 const b = new Manifest({
   name: "b",
   description: "",
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
   dependencies: [a],
+  version: "1.0.0",
+  repository: "https://github.com/BadMagic100/hk-modlinks",
+  links: {
+    url: "https://github.com/BadMagic100/hk-modlinks/releases/latest/download.zip",
+    sha256: "",
+  },
 });
 
 // @ts-expect-error circular export
