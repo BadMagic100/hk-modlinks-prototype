@@ -4,7 +4,8 @@ import { Tags } from "../../tags.js";
 export default new Manifest({
   name: "ZaliantsSurprise",
   displayName: "Zaliant's Surprise",
-  description: "This is a mod idea by Zaliant.\nFormer Description:\nThis is the Pale Court mod.\nEnjoy!",
+  description:
+    "This is a mod idea by Zaliant.\nFormer Description:\nThis is the Pale Court mod.\nEnjoy!",
   version: "1.5.2+0",
   links: {
     sha256: "36F95A1C91874A2A617EA2D719262085E4F038DEF4F132C5C87AB9567DCC7720",

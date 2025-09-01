@@ -3,7 +3,8 @@ import storiesofahkplayer_ch2 from "./storiesofahkplayer-ch2.js";
 
 export default new Manifest({
   name: "Stories of a HK player - Chapter 2",
-  description: "Dummy mod. Install the dependency \"StoriesOfaHkPlayer-Ch2\" directly.",
+  description:
+    'Dummy mod. Install the dependency "StoriesOfaHkPlayer-Ch2" directly.',
   version: "9.9.9-final+9",
   repository: "https://github.com/SFGrenade/EmptyMod",
   links: {

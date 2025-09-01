@@ -4,7 +4,8 @@ import { Tags } from "../../tags.js";
 export default new Manifest({
   name: "MenuThemesInGame",
   displayName: "Menu Themes In Game",
-  description: "Applies the menu color correction to gameplay. Breaks immersion.",
+  description:
+    "Applies the menu color correction to gameplay. Breaks immersion.",
   version: "1.5.0+0",
   links: {
     sha256: "8AF2B8C9FCBD5076F846F88BB2527ADF1DFE2EC47D77DCD7581D821831890CB0",

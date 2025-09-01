@@ -4,7 +4,8 @@ import { Tags } from "../../tags.js";
 export default new Manifest({
   name: "NailsmithBackPay",
   displayName: "Nailsmith Back Pay",
-  description: "Get your geo back from the nailsmith after upgrading your nail.",
+  description:
+    "Get your geo back from the nailsmith after upgrading your nail.",
   version: "1.5.0+0",
   links: {
     sha256: "16188DCD98860FCE814F075966936B434F8FAC7A1556881FFD8CD29A1030E40A",

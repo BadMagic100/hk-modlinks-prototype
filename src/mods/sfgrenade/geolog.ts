@@ -4,7 +4,8 @@ import { Tags } from "../../tags.js";
 export default new Manifest({
   name: "GeoLog",
   displayName: "Geo Log",
-  description: "Logs all geo locations in the game. Goes through the entire game on startup.",
+  description:
+    "Logs all geo locations in the game. Goes through the entire game on startup.",
   version: "1.5.1+0",
   links: {
     sha256: "ABA4861BAA7FFDBF398AD22D6CE317FC41E5579843F80EFFD83B7C6355BE0093",
