@@ -11,7 +11,7 @@ export default new Manifest({
     sha256: "36F95A1C91874A2A617EA2D719262085E4F038DEF4F132C5C87AB9567DCC7720",
     url: "https://github.com/SFGrenade/ZaliantsSurprise/releases/download/v1.5.2/Pail-Curt.zip",
   },
-  dependencies: ["ForgCore", "SFCore", "Vasi"],
+  dependencies: ["FrogCore", "SFCore", "Vasi"],
   repository: "https://github.com/SFGrenade/ZaliantsSurprise",
   issues: "https://github.com/SFGrenade/ZaliantsSurprise/issues",
   integrations: [],

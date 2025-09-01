@@ -47,8 +47,8 @@ export default class Build extends Command {
         }
       }
       if (!isValid) {
-        // next validation won't work if we're already invalid so quit
-        break;
+        // next validation won't work if we're already invalid so quit for this mod
+        continue;
       }
 
       // validation 2 - check for cyclic dependencies, can be bypassed by lazy refs
