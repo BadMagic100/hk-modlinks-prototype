@@ -1,7 +1,9 @@
 import { Command, Flags } from "@oclif/core";
 
-import { allMods } from "../index.js";
 import levenshtein from "fast-levenshtein";
+import { Manifest } from "../manifest.js";
+import { loadPlugins } from "../loader.js";
+import { LoaderError } from "../errors/loader-error.js";
 
 export default class Build extends Command {
   static override enableJsonFlag = false;
@@ -14,7 +16,18 @@ export default class Build extends Command {
   public async run(): Promise<void> {
     const { flags } = await this.parse(Build);
 
-    this.validate();
+    const result = loadPlugins(
+      Manifest<string, string>,
+      import.meta.dirname,
+      "../mods",
+    );
+
+    if (result.failed.length > 0) {
+      this.error(new LoaderError(result.failed));
+    }
+    this.log(`Sucessfully loaded ${result.loaded.length} manifests`);
+
+    this.validate(result.loaded);
 
     const output = flags.output;
     this.log(`Outputting to ${output}`);
@@ -23,10 +36,10 @@ export default class Build extends Command {
   /**
    * Performs validations that either can't be performed trivially or could be bypassed at build time.
    */
-  validate(): void {
+  validate(mods: Manifest<string, string>[]): void {
     let isValid = true;
-    const modNames = allMods.map((m) => m.config.name);
-    for (const mod of allMods) {
+    const modNames = mods.map((m) => m.config.name);
+    for (const mod of mods) {
       // validation 1 - check that all dependencies and integrations are actually real, can be bypassed by lazy refs
       const refs = (mod.config.dependencies ?? []).concat(
         mod.config.integrations ?? [],
@@ -60,7 +73,7 @@ export default class Build extends Command {
         })) ?? [];
       while (toExplore.length) {
         const { name: current, path } = toExplore.pop()!;
-        const currentManifest = allMods.filter(
+        const currentManifest = mods.filter(
           (m) => m.config.name === current,
         )[0];
         if (visited.includes(current)) {

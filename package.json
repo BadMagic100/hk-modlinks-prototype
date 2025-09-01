@@ -33,11 +33,13 @@
   "homepage": "https://github.com/BadMagic100/hk-modlinks-prototype#readme",
   "dependencies": {
     "@oclif/core": "^4.5.2",
+    "debug": "^4.4.1",
     "directory-import": "^3.3.2",
     "fast-levenshtein": "^3.0.0"
   },
   "devDependencies": {
     "@eslint/js": "^9.34.0",
+    "@types/debug": "^4.1.12",
     "@types/fast-levenshtein": "^0.0.4",
     "@types/node": "^24.3.0",
     "eslint": "^9.34.0",
