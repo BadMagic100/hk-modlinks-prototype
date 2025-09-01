@@ -1,8 +1,9 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { directoryImport } from "directory-import";
 import { Manifest } from "./manifest.js";
+import path from "path";
 
-const safeDirName = import.meta.dirname.replaceAll("\\", "/");
+const safeDirName = import.meta.dirname.replaceAll(path.sep, "/");
 
 const allMods: Manifest<string, string>[] = [];
 directoryImport(

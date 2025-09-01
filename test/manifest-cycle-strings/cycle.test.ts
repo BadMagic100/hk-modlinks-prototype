@@ -1,4 +1,4 @@
-import { Manifest } from "../manifest.js";
+import { Manifest } from "../../src/manifest.js";
 import type { Expect, TypesEqual } from "../test-util.js";
 
 const a = new Manifest({

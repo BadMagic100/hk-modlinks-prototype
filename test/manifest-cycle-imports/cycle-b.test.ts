@@ -1,4 +1,4 @@
-import { Manifest } from "../manifest.js";
+import { Manifest } from "../../src/manifest.js";
 import a from "./cycle-a.test.js";
 
 // @ts-expect-error implicit any due to circular import

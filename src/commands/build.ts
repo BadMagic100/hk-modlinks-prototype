@@ -1,7 +1,7 @@
 import { Command, Flags } from "@oclif/core";
 
 import { allMods } from "../index.js";
-import * as levenshtein from "fast-levenshtein";
+import levenshtein from "fast-levenshtein";
 
 export default class Build extends Command {
   static override enableJsonFlag = false;
@@ -79,6 +79,8 @@ export default class Build extends Command {
           .forEach((x) => toExplore.push(x));
       }
     }
+
+    // validation 3 - check hashes (todo)
 
     if (!isValid) {
       this.error("Build failed due the errors above.", { exit: 1 });

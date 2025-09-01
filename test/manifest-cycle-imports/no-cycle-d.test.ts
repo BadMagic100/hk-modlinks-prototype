@@ -1,4 +1,4 @@
-import { Manifest } from "../manifest.js";
+import { Manifest } from "../../src/manifest.js";
 import b from "./no-cycle-b.test.js";
 import c from "./no-cycle-c.test.js";
 import { type Expect, type TypesEqual } from "../test-util.js";
