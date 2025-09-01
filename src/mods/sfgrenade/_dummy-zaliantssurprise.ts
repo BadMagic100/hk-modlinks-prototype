@@ -3,7 +3,7 @@ import zaliantssurprise from "./zaliantssurprise.js";
 
 export default new Manifest({
   name: "Zaliants Surprise",
-  description: "Dummy mod. Install the dependency \"ZaliantsSurprise\" directly.",
+  description: 'Dummy mod. Install the dependency "ZaliantsSurprise" directly.',
   version: "9.9.9-final+9",
   repository: "https://github.com/SFGrenade/EmptyMod",
   links: {

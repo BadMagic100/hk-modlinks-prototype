@@ -3,7 +3,8 @@ import hollowknightachievementmanager from "./hollowknightachievementmanager.js"
 
 export default new Manifest({
   name: "Hollow Knight Achievement Manager",
-  description: "Dummy mod. Install the dependency \"HollowKnightAchievementManager\" directly.",
+  description:
+    'Dummy mod. Install the dependency "HollowKnightAchievementManager" directly.',
   version: "9.9.9-final+9",
   repository: "https://github.com/SFGrenade/EmptyMod",
   links: {

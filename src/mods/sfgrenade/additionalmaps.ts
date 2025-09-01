@@ -4,7 +4,8 @@ import { Tags } from "../../tags.js";
 export default new Manifest({
   name: "AdditionalMaps",
   displayName: "Additional Maps",
-  description: "Adds white palace and godhome maps. The white palace one is next to the bench in the big room. The godhome one is next to the bench above the pantheons.",
+  description:
+    "Adds white palace and godhome maps. The white palace one is next to the bench in the big room. The godhome one is next to the bench above the pantheons.",
   version: "1.5.4+1",
   links: {
     sha256: "78F34209CA461769F15705B73F1C2437BFCFD8894D3DB2201DD4F5B4E635957B",

@@ -4,7 +4,8 @@ import { Tags } from "../../tags.js";
 export default new Manifest({
   name: "MoreMasks",
   displayName: "More Masks",
-  description: "Makes more masks available to be displayed. Also works for lifeblood masks. By default it shows 28 masks per row. Can be adjusted by editing the globalsettings file of this mod.",
+  description:
+    "Makes more masks available to be displayed. Also works for lifeblood masks. By default it shows 28 masks per row. Can be adjusted by editing the globalsettings file of this mod.",
   version: "1.5.0+1",
   links: {
     sha256: "90310FBD2D7FB735351CB4089552EB84ABF3AF80D95FA550C48CC88F32C6A8C0",

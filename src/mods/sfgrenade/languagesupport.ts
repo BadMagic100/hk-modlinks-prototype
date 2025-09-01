@@ -4,7 +4,8 @@ import { Tags } from "../../tags.js";
 export default new Manifest({
   name: "LanguageSupport",
   displayName: "Language Support",
-  description: "Allows additional languages to be supported. Doesn't allow for some characters of other languages yet.",
+  description:
+    "Allows additional languages to be supported. Doesn't allow for some characters of other languages yet.",
   version: "1.5.1+0",
   links: {
     sha256: "F1C9853EFF0361019DCAEE19CE652EB972127C08711701E71D5C79C679F99609",

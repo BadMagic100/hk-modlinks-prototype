@@ -3,7 +3,8 @@ import peakingpeekingpeaks from "./peakingpeekingpeaks.js";
 
 export default new Manifest({
   name: "Peaking Peeking Peaks",
-  description: "Dummy mod. Install the dependency \"PeakingPeekingPeaks\" directly.",
+  description:
+    'Dummy mod. Install the dependency "PeakingPeekingPeaks" directly.',
   version: "9.9.9-final+9",
   repository: "https://github.com/SFGrenade/EmptyMod",
   links: {

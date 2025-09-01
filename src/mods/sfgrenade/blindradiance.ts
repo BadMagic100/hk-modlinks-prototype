@@ -4,7 +4,8 @@ import { Tags } from "../../tags.js";
 export default new Manifest({
   name: "BlindRadiance",
   displayName: "Blind Radiance",
-  description: "Makes background darker in selected scenes to make foreground objects more visible.",
+  description:
+    "Makes background darker in selected scenes to make foreground objects more visible.",
   version: "1.5.2+3",
   links: {
     sha256: "C5FD2168D077FD8F96275804966E527F5361DD94927F598A47B415610DCEFE19",

@@ -3,7 +3,7 @@ import pvparena from "./pvparena.js";
 
 export default new Manifest({
   name: "PvP Arena",
-  description: "Dummy mod. Install the dependency \"PvpArena\" directly.",
+  description: 'Dummy mod. Install the dependency "PvpArena" directly.',
   version: "9.9.9-final+9",
   repository: "https://github.com/SFGrenade/EmptyMod",
   links: {

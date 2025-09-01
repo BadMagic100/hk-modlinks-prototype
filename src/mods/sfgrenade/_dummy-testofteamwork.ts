@@ -3,7 +3,7 @@ import testofteamwork from "./testofteamwork.js";
 
 export default new Manifest({
   name: "Test of Teamwork",
-  description: "Dummy mod. Install the dependency \"TestOfTeamwork\" directly.",
+  description: 'Dummy mod. Install the dependency "TestOfTeamwork" directly.',
   version: "9.9.9-final+9",
   repository: "https://github.com/SFGrenade/EmptyMod",
   links: {
