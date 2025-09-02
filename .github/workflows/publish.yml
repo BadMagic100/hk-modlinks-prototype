@@ -1,0 +1,51 @@
+name: Publish
+
+on:
+  push:
+    branches: [ master ]
+
+permissions:
+  actions: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  publish-pages:
+    runs-on: ubuntu-latest
+
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: lts/*
+          check-latest: true
+      
+      - name: Install Dependencies
+        run: npm install
+
+      - name: TypeScript Build
+        run: npm run build
+
+      - name: ModLinks Build
+        run: npx modlinks build -o output
+
+      - name: Upload Assets
+        uses: actions/upload-pages-artifact@v4
+        with:
+          path: output
+
+      - name: Deploy
+        id: deployment
+        uses: actions/deploy-pages@v4
+      

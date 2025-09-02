@@ -74,6 +74,8 @@ export default class Build extends Command {
       transformsMapping,
       flags.format,
     );
+
+    this.log("Build complete!");
   }
 
   /**
