@@ -5,7 +5,10 @@ import { Manifest } from "../manifest.js";
 import { loadPlugins } from "../loader.js";
 import { LoaderError } from "../errors/loader-error.js";
 import { ErrorCodes } from "../errors/error-codes.js";
-import { setTimeout } from "timers/promises";
+import { BuildTransform, type FileMapping } from "../build-transform.js";
+
+import * as fsPromises from "node:fs/promises";
+import path from "node:path";
 
 export default class Build extends Command {
   static override enableJsonFlag = false;
@@ -13,37 +16,70 @@ export default class Build extends Command {
   static override examples = ["<%= config.bin %> <%= command.id %> -o ./build"];
   static override flags = {
     output: Flags.directory({ char: "o", required: true }),
+    format: Flags.string({ char: "f", multiple: true }),
   };
 
   public async run(): Promise<void> {
     const { flags } = await this.parse(Build);
 
-    const result = loadPlugins(
+    const modsResult = loadPlugins(
       Manifest<string, string>,
       import.meta.dirname,
       "../mods",
     );
+    const transformsResult = loadPlugins(
+      BuildTransform,
+      import.meta.dirname,
+      "../build-transforms",
+    );
 
-    if (result.failed.length > 0) {
-      this.error(new LoaderError(result.failed), {
+    if (modsResult.failed.length > 0) {
+      this.error(new LoaderError(modsResult.failed), {
         exit: ErrorCodes.LOADER_FAULT,
       });
     }
-    this.log(`Sucessfully loaded ${result.loaded.length} manifests`);
+    if (transformsResult.failed.length > 0) {
+      this.error(new LoaderError(transformsResult.failed), {
+        exit: ErrorCodes.LOADER_FAULT,
+      });
+    }
+    const transformsMapping = transformsResult.loaded.reduce(
+      (acc, item) => {
+        if (item.transformId in acc) {
+          this.error(
+            `Encountered unexpected duplicate transform ${item.transformId}`,
+            { exit: ErrorCodes.LOADER_FAULT },
+          );
+        }
+        acc[item.transformId] = item;
+        return acc;
+      },
+      {} as Record<string, BuildTransform>,
+    );
 
-    this.validate(result.loaded);
+    this.log(
+      `Sucessfully loaded ${modsResult.loaded.length} manifests and ${transformsResult.loaded.length} output formats`,
+    );
 
-    const output = flags.output;
+    this.validate(modsResult.loaded);
+
+    const output = path.normalize(flags.output);
     this.log(`Outputting to ${output}`);
+    await fsPromises.rm(output, { recursive: true, force: true });
 
-    const finalOutputManifests = this.preTransform(result.loaded);
-    await this.postTransform(finalOutputManifests);
+    const finalOutputManifests = this.preTransform(modsResult.loaded);
+    await this.postTransform(
+      output,
+      finalOutputManifests,
+      transformsMapping,
+      flags.format,
+    );
   }
 
   /**
    * Performs validations that either can't be performed trivially or could be bypassed at build time.
    */
-  validate(mods: Manifest<string, string>[]): void {
+  private validate(mods: Manifest<string, string>[]): void {
     this.debug("Beginning validation");
 
     let isValid = true;
@@ -111,14 +147,62 @@ export default class Build extends Command {
     }
   }
 
-  preTransform(mods: Manifest<string, string>[]): Manifest<string, string>[] {
+  private preTransform(
+    mods: Manifest<string, string>[],
+  ): Manifest<string, string>[] {
     this.debug("Beginning pre-transform");
-    return mods;
+    const transformed = mods.map((x) => structuredClone(x));
+    // todo - this is where we'd add/change metadata
+    transformed.sort((a, b) => a.config.name.localeCompare(b.config.name));
+    return transformed;
   }
 
-  async postTransform(mods: Manifest<string, string>[]): Promise<void> {
+  private async postTransform(
+    outputDir: string,
+    mods: Manifest<string, string>[],
+    outputTransforms: Record<string, BuildTransform>,
+    requestedFormats?: string[],
+  ): Promise<void> {
     this.debug("Beginning post-transform");
-    await setTimeout(500);
-    this.logJson(mods[0]);
+
+    const requestedTransforms: BuildTransform[] = [];
+    if (requestedFormats) {
+      for (const fmt of requestedFormats) {
+        const tf = outputTransforms[fmt];
+        if (tf) {
+          requestedTransforms.push(tf);
+        } else {
+          this.warn(`Requested format ${fmt} is not defined`);
+        }
+      }
+    } else {
+      this.log("No output format specified, running all output formats");
+      requestedTransforms.push(...Object.values(outputTransforms));
+    }
+
+    await Promise.all(
+      requestedTransforms.map((x) =>
+        x
+          .run(mods)
+          .then((m) => this.writeFileMapping(outputDir, x.transformId, m)),
+      ),
+    );
+  }
+
+  private writeFileMapping(
+    outputDir: string,
+    transformId: string,
+    mapping: FileMapping,
+  ) {
+    return Promise.all(
+      Object.entries(mapping).map(async ([p, buf]) => {
+        const normPath = path.normalize(p);
+        const resolvedPath = path.resolve(outputDir, transformId, normPath);
+        const baseDir = path.dirname(resolvedPath);
+        this.debug(`Preparing write to ${resolvedPath}`);
+        await fsPromises.mkdir(baseDir, { recursive: true });
+        await fsPromises.writeFile(resolvedPath, buf);
+      }),
+    );
   }
 }

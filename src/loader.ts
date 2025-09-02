@@ -1,11 +1,9 @@
 import path from "path";
 import { directoryImport } from "directory-import";
 import createDebug from "debug";
+import type { Class } from "./utility-types.js";
 
 const debug = createDebug("hk-modlinks:loader");
-
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-type Class<T> = { new (...args: any[]): T };
 
 export interface ModuleInfo {
   modulePath: string;
@@ -24,15 +22,15 @@ export function loadPlugins<T>(
   relativePath: string,
   recurse: boolean = true,
 ): LoaderResult<T> {
-  const platformRelativePath = relativePath.replace("/", path.sep);
+  const normRelativePath = path.normalize(relativePath);
   if (!path.isAbsolute(callingDir)) {
     throw new Error("callingDir must be an absolute path");
   }
-  if (path.isAbsolute(platformRelativePath)) {
+  if (path.isAbsolute(normRelativePath)) {
     throw new Error("relativePath must be a relative path");
   }
 
-  const resolvedPluginPath = path.resolve(callingDir, platformRelativePath);
+  const resolvedPluginPath = path.resolve(callingDir, normRelativePath);
 
   const loaded: T[] = [];
   const failed: ModuleInfo[] = [];

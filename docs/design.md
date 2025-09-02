@@ -190,7 +190,7 @@ interface for transforms and a toy example transformer are presented below.
 ```ts
 interface BuildTransform {
   readonly transformId: string;
-  run: (manifests: Manifest[]) => Promise<Record<string, Buffer>>;
+  run(manifests: Manifest[]): Promise<Record<string, Buffer>>;
 }
 
 class JsonTransform {
