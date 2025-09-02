@@ -4,6 +4,8 @@ import levenshtein from "fast-levenshtein";
 import { Manifest } from "../manifest.js";
 import { loadPlugins } from "../loader.js";
 import { LoaderError } from "../errors/loader-error.js";
+import { ErrorCodes } from "../errors/error-codes.js";
+import { setTimeout } from "timers/promises";
 
 export default class Build extends Command {
   static override enableJsonFlag = false;
@@ -23,7 +25,9 @@ export default class Build extends Command {
     );
 
     if (result.failed.length > 0) {
-      this.error(new LoaderError(result.failed));
+      this.error(new LoaderError(result.failed), {
+        exit: ErrorCodes.LOADER_FAULT,
+      });
     }
     this.log(`Sucessfully loaded ${result.loaded.length} manifests`);
 
@@ -31,12 +35,17 @@ export default class Build extends Command {
 
     const output = flags.output;
     this.log(`Outputting to ${output}`);
+
+    const finalOutputManifests = this.preTransform(result.loaded);
+    await this.postTransform(finalOutputManifests);
   }
 
   /**
    * Performs validations that either can't be performed trivially or could be bypassed at build time.
    */
   validate(mods: Manifest<string, string>[]): void {
+    this.debug("Beginning validation");
+
     let isValid = true;
     const modNames = mods.map((m) => m.config.name);
     for (const mod of mods) {
@@ -96,7 +105,20 @@ export default class Build extends Command {
     // validation 3 - check hashes (todo)
 
     if (!isValid) {
-      this.error("Build failed due the errors above.", { exit: 1 });
+      this.error("Build failed due the errors above.", {
+        exit: ErrorCodes.BUILD_FAILURE,
+      });
     }
+  }
+
+  preTransform(mods: Manifest<string, string>[]): Manifest<string, string>[] {
+    this.debug("Beginning pre-transform");
+    return mods;
+  }
+
+  async postTransform(mods: Manifest<string, string>[]): Promise<void> {
+    this.debug("Beginning post-transform");
+    await setTimeout(500);
+    this.logJson(mods[0]);
   }
 }
