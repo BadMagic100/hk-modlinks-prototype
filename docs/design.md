@@ -22,6 +22,10 @@ relationship to the developer experience.
     parse, size over the network, etc.).
   - XML schema validation imposes some arbitrary restrictions on the way data can be provided, which
     are not transparent to developers.
+- Lack of indirection between the source code and the output makes modlinks brittle.
+  - Modlinks can be broken by external changes (e.g. removal of dowloads without changing the file).
+  - Major schema changes cannot be made easily because consumers (e.g. installers) need time to
+    adapt.
 - For new users, an intermediate-level knowledge of git and GitHub are required to create a pull
   request to modlinks, which can be a barrier to entry.
 - For power users, there is limited additional support to improve efficiency.
@@ -73,12 +77,12 @@ mandatory for web development. With TypeScript and other developer tooling we ca
 - The ability to easily run arbitrary code to discover mods and transform to various formats
   (although any programming language can provide this).
 
-Modlinks's discovery, build, and output systems will be designed with a plugin architecture. This
-allows additional mods and output formats to be added easily with no frills. Particularly, this
-means that developers PRing their mods do not need to touch code outside the file that will contain
-their mod. For developers unfamiliar with git, copying from another mod and committing via the
-GitHub website will still suffice (though they will of course lose the developer quality of life
-tooling), which keeps it as one step to onboard.
+Modlinks's build and output systems will be designed with a plugin architecture. This allows
+additional mods and output formats to be added easily with no frills. Particularly, this means that
+developers PRing their mods do not need to touch code outside the file that will contain their mod.
+For developers unfamiliar with git, copying from another mod and committing via the GitHub website
+will still suffice (though they will of course lose the developer quality of life tooling), which
+keeps it as one step to onboard.
 
 The entry point for the plugin loader will be CLIs vended via package.json's `bin` property. The
 main benefit of this as opposed to a standalone script run with e.g. Jiti or ts-node is that we can
@@ -148,34 +152,116 @@ export default new Manifest({
 });
 ```
 
-### Discovery
+### Build
 
-Modlinks will provide a mechanism to automatically discover and create or update sets of manifests
-from various sources. This will allow developers to simplify their release process. For example, one
-possible discovery source might be to search GitHub for a given user's repositories that are
-prefixed with `HollowKnight.` and generate manifests based on those. Another discovery source with a
-much clearer path to implementation would be for a developer to create their own TypeScript package
-with a dependency on the modlinks package, and vend their own "mini-modlinks" of their own mods
-only, which could then be consumed and aggregated into the main modlinks.
+Once all mods' manifests are added, modlinks can then be built to various output formats using the
+`modlinks build` command. Builds will comprise of 3 steps:
+
+1. Validation which cannot easily be done statically.
+2. Pre-transforms.
+3. Post-transforms/output.
+
+While TypeScript is powerful, there are limits to what is reasonable to validate at compile time. As
+such, we will do validations including but not necessarily limited to:
+
+- Ensuring that link downloads match the provided SHA.
+- Ensuring that if the link or hash is changed, the version must be updated.
+- Ensuring that version strictly increases.
+
+The pre-transform step is the main layer of indirection between source and metadata. This
+intermediate output allows us to apply backwards compatibility so we can iterate on the modlinks
+schema and protect against external changes. Concretely, some things we could do here include:
+
+- Copying and re-packaging the download link (replacing it in the final output) so that mod authors
+  cannot remove their mods without notice
+- Mirroring breaking schema changes as backwards compatible - for example, if we wanted mods to have
+  a full version history in modlinks, we could mirror either the latest version in the current
+  "links" and "version" fields and allow installers to adapt before removing the old fields (with
+  some possible variations in this strategy available)
+
+The post-transform step then takes the final manifest list and exports to multiple output formats,
+also leveraging a plugin architecture. However, unlike the other components, it may not always be
+desirable to build to all output formats. Therefore, all build transforms will have a transform ID
+that must be globally unique. This allows build commands to directly specify what transforms to run
+or skip. Running a transform returns a mapping of files to be written and their contents, which will
+be actually written to the file system based on the transform ID and inputs to the build command. An
+interface for transforms and a toy example transformer are presented below.
+
+```ts
+interface BuildTransform {
+  readonly transformId: string;
+  run: (manifests: Manifest[]) => Promise<Record<string, Buffer>>;
+}
+
+class JsonTransform {
+  readonly transformId = "json";
+  async run(manifests: Manifest[]): Promise<Record<string, Buffer>> {
+    const content = JSON.stringify(manifests);
+    return {
+      "modlinks.json": Buffer.from(content, "utf8"),
+    };
+  }
+}
+```
+
+Before going through the final output transformers however, the manifests will be validated for
+anything that cannot be done statically, e.g. validating that the downloads match the provided hash.
+This can also be an opportunity for pre-transformations, such as copying the release asset and
+hosting it alongside modlinks (swapping out the link in the output). Some additional validations we
+may wish to do might include:
+
+- Ensuring that if the link or hash changes, version must change as well.
+- Ensuring that version is strictly increasing.
+
+### Publishing
+
+We can use GitHub pages to host published modlinks artifacts. Recent improvements to GitHub Actions
+and GitHub Pages integration will allow us to publish these artifacts as static content without
+needing to ever surface the compiled artifacts in git directly. Consumers can then download the
+artifacts, e.g. from `https://badmagic100.github.io/hk-modlinks/json/modlinks.json` for the example
+transform above.
+
+### Future Improvements
+
+While this design addresses many of the immediate pain points elegantly, it also opens the door to a
+number of future improvements.
+
+#### Simplifying Onboarding for Beginners
+
+The main weakness of this design is that it doesn't do much to help users who are not familiar with
+git or GitHub. There is a minimum of 1 PR required even if you want to use discovery. However, I
+think we can safely say that we have not done a _worse_ job than the current system in the sense
+that copy-pasting from another mod is always an option. Additionally there are some tailwinds in
+this area which could be explored more thoroughly outside of the scope of this document; in
+particular, much like how multiple smaller files are easier for CI to work with, they are also
+easier for _tools_ to work with, which means we could create a publisher tool that makes the user
+OAuth with GitHub and then fill in a form with the required fields, then fork modlinks, generate and
+commit the file, and submit PR automatically on the user's behalf. Such a tool might also be
+semi-reusable towards an "assetlinks" for things such as CustomHornet skins.
+
+#### Simplifying Onboarding for Power Users (Discovery)
+
+A mechanism to automatically discover and create or update sets of manifests from various sources
+can leverage the plugin architecture designed for the other components. This will allow developers
+to simplify their release process. For example, one possible discovery source might be to search
+GitHub for a given user's repositories that are prefixed with `HollowKnight.` and generate manifests
+based on those. Another discovery source with a much clearer path to implementation would be for a
+developer to create their own TypeScript package with a dependency on the modlinks package, and vend
+their own "mini-modlinks" of their own mods only, which could then be consumed and aggregated into
+the main modlinks.
 
 Discovery will not run as part of each build, as it is generally expected to be an intensive process
 which may go out to the internet multiple times and places. This can make builds extremely slow if
 discovery is used extensively. Additionally, we still want to be able to review (and potentially
 reject/blocklist) discovered content. As such, discovery will be implemented as a source gen step
-which is run on a schedule, with changes automatically being PR'd to the main branch for review. For
-source generation, [ts-morph](https://github.com/dsherret/ts-morph) will be used as a high level
-wrapper over the TypeScript compiler API. Discovery will be run using the `modlinks discover`
-command.
+using [ts-morph](https://github.com/dsherret/ts-morph) as a high level wrapper over the TypeScript
+compiler API. Discovery will be run using the `modlinks discover` command. Whether discovery should
+run automatically on a schedule, on demand, or both with an opt in/out toggle for automation is an
+open question, but in any case, discovery would be run somewhere and then the generated manifests
+would be PR'd to modlinks.
 
-Discovery will also use a plugin architecture. Discovery plugins will reside in the
-`discovery-rules` directory, conventionally `discovery-rules/author-name.ts` The default export of
-each module will be an array of discovery plugins. We generally expect that most developers would
-choose only one discovery mechanism and stick with it, but this enables them to partially migrate or
-otherwise use multiple discovery mechanisms without needing additional files. Each plugin will be an
-object containing a `async function generateSources(): void` which has the side effect of creating
-any source files necessary. In practice, we would provide some classes for common discovery sources
-which can be configured; however, ad-hoc discovery mechanisms could also be implemented. For
-example:
+Below is an example of what discovery might look like in practice, though this is heavily subject to
+change.
 
 ```ts
 // discovery/github.ts (we provide)
@@ -204,39 +290,6 @@ export default [
 ];
 ```
 
-### Build
-
-Once all mods' manifests are added, modlinks can then be built to various output formats using the
-`modlinks build` command. By now it should be no surprise the builds will use a plugin architecture
-as well. However, unlike the other components, it may not always be desirable to build to all output
-formats. Therefore, all build transforms will have a transform ID that must be globally unique. This
-allows build commands to directly specify what transforms to run or skip. Running a transform has
-the side effect of generating any necessary files based on the aggregated list of mod links. An
-interface for transforms and a toy example transformer are presented below.
-
-```ts
-interface BuildTransform {
-  readonly transformId: string;
-  run: (manifests: Manifest[]) => Promise<void>;
-}
-
-class JsonTransform {
-  readonly transformId = "json";
-  async run(manifests: Manifest[]): void {
-    const content = JSON.stringify(manifests);
-    await fs.writeFile("build/json/modlinks.json", content);
-  }
-}
-```
-
-### Publishing
-
-We can use GitHub pages to host published modlinks artifacts. Recent improvements to GitHub Actions
-and GitHub Pages integration will allow us to publish these artifacts as static content without
-needing to ever surface the compiled artifacts in git directly. Consumers can then download the
-artifacts, e.g. from `https://badmagic100.github.io/hk-modlinks/json/modlinks.json` for the example
-transform above.
-
 ### Mini-Modlinks
 
 While the ability to isolate manifests to an author-specific folder helps address some pain points
@@ -250,7 +303,7 @@ necessarily limited to:
   host that list, including publishing certain output formats (e.g. HTML or markdown) automatically
   as a CI workflow.
 
-This design enables this use case by:
+If/when discovery is added, this design enables this use case by:
 
 - Vending all build tools as CLIs and publishing the package to npm
 - Ensuring that all mods are available in main modlinks for importing (discovery source generation)
@@ -260,15 +313,6 @@ Similarly to how modlinks itself will publish to GitHub pages, developers can th
 mini-modlinks to GitHub pages or any other static hosting site. Modlinks can then ingest the hosted
 artifacts (e.g. in JSON format) as a discovery source.
 
-### "Noob" Users
-
-The main weakness of this design is that it doesn't do much to help users who are not familiar with
-git or GitHub. There is a minimum of 1 PR required even if you want to use discovery. However, I
-think we can safely say that we have not done a _worse_ job than the current system in the sense
-that copy-pasting from another mod is always an option. Additionally there are some tailwinds in
-this area which could be explored more thoroughly outside of the scope of this document; in
-particular, much like how multiple smaller files are easier for CI to work with, they are also
-easier for _tools_ to work with, which means we could create a publisher tool that makes the user
-OAuth with GitHub and then fill in a form with the required fields, then fork modlinks, generate and
-commit the file, and submit PR automatically on the user's behalf. Such a tool might also be
-semi-reusable towards an "assetlinks" for things such as CustomHornet skins.
+Alternatively, without discovery, it should be possible for mini-modlinks packages to be added as
+peer dependencies of the full modlinks and then imported at runtime (though this would require
+adjustments to the plugin loader).
