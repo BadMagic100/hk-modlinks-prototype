@@ -33,6 +33,7 @@
   "homepage": "https://github.com/BadMagic100/hk-modlinks-prototype#readme",
   "dependencies": {
     "@oclif/core": "^4.5.2",
+    "cbor2": "^2.0.1",
     "debug": "^4.4.1",
     "directory-import": "^3.3.2",
     "fast-levenshtein": "^3.0.0"
