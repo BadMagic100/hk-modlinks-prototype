@@ -28,6 +28,14 @@ export default tseslint.config(
       "@typescript-eslint/no-unused-vars": "off",
     },
   },
+  {
+    files: ["test/manifest-cycle-imports/**"],
+    rules: {
+      // where this error is flagged is unpredictable due to the import cycle and eslint
+      // will often attempt to remove inline ignores.
+      "@typescript-eslint/no-unsafe-assignment": "off",
+    },
+  },
   // must be last
   eslintPluginPrettierRecommended,
 );
