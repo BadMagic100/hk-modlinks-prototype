@@ -1,3 +1,4 @@
 npm run format:docs
 npm run build
+npx modlinks build -o output --diff-against https://badmagic100.github.io/hk-modlinks-prototype/json/modlinks.json
 git update-index --again

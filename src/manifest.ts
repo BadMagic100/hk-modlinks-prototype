@@ -5,12 +5,12 @@ type PrereleasePart = `-${string}` | "";
 type BuildPart = `+${string}` | "";
 type Version = `${VersionCorePart}${PrereleasePart}${BuildPart}`;
 
-interface SingleLink {
+export interface SingleLink {
   url: string;
   sha256: string;
 }
 
-interface PlatformLinks {
+export interface PlatformLinks {
   linux: SingleLink;
   mac: SingleLink;
   windows: SingleLink;
@@ -32,12 +32,12 @@ type BaseModConfig<Name extends string> = {
   readonly authors?: string[];
 };
 
-type UncheckedConfig<Name extends string> = BaseModConfig<Name> & {
+export type UncheckedConfig<Name extends string> = BaseModConfig<Name> & {
   readonly dependencies?: string[] | undefined;
   readonly integrations?: string[] | undefined;
 };
 
-type StringCheckedConfig<
+export type StringCheckedConfig<
   Name extends string,
   DependencyClosure extends string,
 > = BaseModConfig<Name> & {
@@ -45,7 +45,7 @@ type StringCheckedConfig<
   readonly integrations?: string[];
 };
 
-type ManifestCheckedConfig<
+export type ManifestCheckedConfig<
   Name extends string,
   DependencyClosure extends string,
 > = BaseModConfig<Name> & {

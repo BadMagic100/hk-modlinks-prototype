@@ -1,5 +1,6 @@
+import axios from "axios";
 import { BuildTransform, type FileMapping } from "../build-transform.js";
-import type { Manifest } from "../manifest.js";
+import { Manifest, type StringCheckedConfig } from "../manifest.js";
 
 export class JsonTransform extends BuildTransform {
   readonly transformId = "json";
@@ -20,6 +21,13 @@ export class JsonTransform extends BuildTransform {
     return Promise.resolve({
       "modlinks.json": Buffer.from(outputString, "utf8"),
     });
+  }
+
+  async parse(url: URL): Promise<Manifest<string, string>[]> {
+    const response = await axios.get(url.toString());
+    return (response.data as unknown[]).map(
+      (x) => new Manifest(x as StringCheckedConfig<string, string>),
+    );
   }
 }
 

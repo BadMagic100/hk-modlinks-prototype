@@ -38,7 +38,10 @@ jobs:
         run: npm run build
 
       - name: ModLinks Build
-        run: npx modlinks build -o output
+        run: >-
+          npx modlinks build -o output \
+            --diff-against https://badmagic100.github.io/hk-modlinks-prototype/json/modlinks.json \
+            --require-hash-check
 
       - name: Upload Assets
         uses: actions/upload-pages-artifact@v4
