@@ -26,7 +26,6 @@ export default tseslint.config(
     files: ["test/**"],
     rules: {
       "@typescript-eslint/no-unused-vars": "off",
-      "@typescript-eslint/no-unsafe-assignment": "warn",
     },
   },
   // must be last

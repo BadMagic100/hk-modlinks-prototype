@@ -17,15 +17,34 @@ import axios from "axios";
 export default class Build extends Command {
   static override enableJsonFlag = false;
   static override description = "describe the command here";
-  static override examples = ["<%= config.bin %> <%= command.id %> -o ./build"];
+  static override examples = [
+    "<%= config.bin %> <%= command.id %> -o ./build --no-diff",
+  ];
   static override flags = {
-    output: Flags.directory({ char: "o", required: true }),
+    output: Flags.directory({
+      char: "o",
+      required: true,
+      description: "Path to the output directory",
+    }),
     "diff-against": Flags.url({
       char: "d",
       exactlyOne: ["diff-against", "no-diff"],
+      description:
+        "A link to download the currently-published JSON output of modlinks to " +
+        "provide richer validations during updates by diffing for changes. Exactly one " +
+        "of diff-against and no-diff must be provided.",
     }),
-    "no-diff": Flags.boolean({ exactlyOne: ["diff-against", "no-diff"] }),
-    format: Flags.string({ char: "f", multiple: true }),
+    "no-diff": Flags.boolean({
+      exactlyOne: ["diff-against", "no-diff"],
+      description:
+        "Skip diff-based validations. Exactly one of diff-against and no-diff must be provided",
+    }),
+    format: Flags.string({
+      char: "f",
+      multiple: true,
+      description:
+        "ID of an output transformer to be run. Can be specified multiple times. If not specified, all transformers run.",
+    }),
     "require-hash-check": Flags.boolean({
       description:
         "Forces the hash check to be run even when it could be skipped because the link has not changed",
