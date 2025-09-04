@@ -3,7 +3,11 @@
   "version": "1.0.0",
   "description": "Prototype of using node to manage modlinks for Hollow Knight modding",
   "type": "module",
-  "exports": "./dist/src/index.js",
+  "exports": {
+    ".": "./dist/src/index.js",
+    "./mods/*": "./dist/src/mods/*.js",
+    "./build-transforms/*": "./dist/src/build-transforms/*.js"
+  },
   "files": [
     "./bin",
     "./dist/src"
@@ -14,7 +18,7 @@
   "scripts": {
     "clean": "shx rm -rf dist",
     "lint": "eslint . --fix --cache",
-    "format:docs": "prettier --write docs/**.md",
+    "format:docs": "prettier --write **.md",
     "test": "echo OK",
     "build": "npm run clean && npm run lint && npm run test && tsc",
     "prepare": "husky",
